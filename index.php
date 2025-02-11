@@ -1,0 +1,50 @@
+<?php
+$cookie_file_path = ""; // path do przechowywania ciasteczek 
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie_file_path); // "The name of the file containing the cookie data ..."
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // "Set CURLOPT_RETURNTRANSFER to TRUE to return the transfer as a string of the return value of curl_exec()"
+curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); // "true to follow any "Location: " header that the server sends as part of the HTTP header."
+get("https://synergia.librus.pl/loguj/portalRodzina?v=1738664710");
+
+$arr = array(
+    "action" => "login",
+    "login" => "9160565u",
+    "pass" => "!1Qaz2Wsx"
+);
+post("https://api.librus.pl/OAuth/Authorization?client_id=46", $arr);
+
+$arr = array(
+    "command" => "open_synergia_window",
+    "commandPayload" => array(
+        "url" => "https:\/\/synergia.librus.pl\/uczen\/index"
+    )
+);
+post("https://api.librus.pl/OAuth/Authorization/2FA?client_id=46", $arr);
+
+$librusFull =  get("https://synergia.librus.pl/przegladaj_oceny/uczen");
+$librusJS = str_replace('href="', 'href="https://synergia.librus.pl',$librusFull);
+$librusCSS = str_replace('src="', 'src="https://synergia.librus.pl',$librusJS);
+$librusHeadless = str_replace('<div id="header"', '<div id="header" style="display:none;" ',$librusCSS);
+$librusSortless = str_replace('<table class="right sort_box">', '<table class="right sort_box" style="display:none;">',$librusHeadless);
+$librusSpanless = str_replace('<span class="fold"> ', '<span class="fold" style="opacity:0">',$librusSortless);
+
+echo $librusSpanless;
+
+function get($url)
+{
+    global $ch;
+    curl_setopt($ch, CURLOPT_URL, $url); // "The URL to fetch."
+    $res = curl_exec($ch);
+    return $res;
+}
+
+function post($url, $fields)
+{
+    global $ch;
+    $POSTFIELDS = http_build_query($fields);
+    curl_setopt($ch, CURLOPT_POST, 1); // "true to do a regular HTTP POST."
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $POSTFIELDS); // "The full data to post in a HTTP "POST" operation."
+    curl_setopt($ch, CURLOPT_URL, $url);
+    $res = curl_exec($ch);
+    return $res;
+}
