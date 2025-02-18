@@ -24,25 +24,25 @@ post("https://api.librus.pl/OAuth/Authorization/2FA?client_id=46", $arr);
 $librusDOM = new DOMDocument();
 $xpath = new DOMXPath($librusDOM);
 $sortedGrades = array(
-    "aplikacje desktopowe"=>[],
-    "aplikacje mobilne"=>[],
-    "aplikacje webowe"=>[],
-    "biologia"=>[],
-    "chemia"=>[],
-    "fizyka"=>[],
-    "fizyka techniczna"=>[],
-    "geografia"=>[],
-    "historia"=>[],
-    "język angielski"=>[],
-    "język angielski zawodowy"=>[],
-    "język niemiecki"=>[],
-    "język polski"=>[],
-    "matematyka"=>[],
-    "praktyka zawodowa"=>[],
-    "religia/etyka"=>[],
-    "wiedza o społeczeństwie"=>[],
-    "wychowanie fizyczne"=>[],
-    "zajęcia z wychowawcą"=>[]
+    "aplikacje desktopowe"=>[[],[]],
+    "aplikacje mobilne"=>[[],[]],
+    "aplikacje webowe"=>[[],[]],
+    "biologia"=>[[],[]],[],
+    "chemia"=>[[],[]],
+    "fizyka"=>[[],[]],
+    "fizyka techniczna"=>[[],[]],
+    "geografia"=>[[],[]],
+    "historia"=>[[],[]],
+    "język angielski"=>[[],[]],
+    "język angielski zawodowy"=>[[],[]],
+    "język niemiecki"=>[[],[]],
+    "język polski"=>[[],[]],
+    "matematyka"=>[[],[]],
+    "praktyka zawodowa"=>[[],[]],
+    "religia/etyka"=>[[],[]],
+    "wiedza o społeczeństwie"=>[[],[]],
+    "wychowanie fizyczne"=>[[],[]],
+    "zajęcia z wychowawcą"=>[[],[]],
 );
 $librusFull =  get("https://synergia.librus.pl/przegladaj_oceny/uczen");
 $librusJS = str_replace('href="', 'href="https://synergia.librus.pl',$librusFull);
@@ -53,13 +53,26 @@ $librusSpanless = str_replace('<span class="fold"> ', '<span class="fold" style=
 
 @$librusDOM->loadHTML($librusSpanless);
 $xpath = new DOMXPath($librusDOM);
-$grades= $xpath->query('//span[@class="grade-box"]');
-print_r($grades);
+$grades= $xpath->query('//span[@style!="background-color:#B0C4DE; "]');
 foreach ($grades as $gradeNode){
-    $grade = $gradeNode->nodeValue;
-    $subject = $gradeNode->parentNode->previousSibling->nodeValue;
+    @$grade = $gradeNode;
+    @$subject = $gradeNode->parentNode->previousSibling->nodeValue;
     try{
-        $sortedGrades[$subject][]=$grade;
+        if(key_exists($subject,$sortedGrades)){
+            $sortedGrades[$subject][0][]=$grade;
+        }
+        else{
+            @$subject = $gradeNode->parentNode->previousSibling->previousSibling->previousSibling->previousSibling->nodeValue;
+            if(key_exists($subject,$sortedGrades)){
+                $sortedGrades[$subject][1][]=$grade;
+            }
+            else{
+                @$subject = $gradeNode->parentNode->previousSibling->previousSibling->previousSibling->previousSibling->previousSibling->nodeValue;
+                if(key_exists($subject,$sortedGrades)){
+                    $sortedGrades[$subject][1][]=$grade;
+                }
+            }
+        }
     }
     catch(Exception $e){
         echo $e;
@@ -67,9 +80,12 @@ foreach ($grades as $gradeNode){
 }
 $index = 0;
 foreach ($sortedGrades as $subject){
-    echo array_keys($sortedGrades)[$index]." ";
-    print_r($subject);
-    echo "<br/>";
+    @$tableRow = $xpath->query('//tr[@class="line'.$index.'"]');
+    foreach($subject[0] as $grade){
+        print_r($index.' '.$tableRow->firstChild->nodeValue.'<br/>');
+        // $gradeBox = $tableRow->firstChild->nextSibling->nextSibling->appendChild($grade);
+
+    }
     $index+=1;
 }
 echo $librusDOM->saveHTML();
