@@ -78,15 +78,30 @@ foreach ($grades as $gradeNode){
         echo $e;
     }
 }
-$index = 0;
-foreach ($sortedGrades as $subject){
-    @$tableRow = $xpath->query('//tr[@class="line'.$index.'"]');
-    foreach($subject[0] as $grade){
-        print_r($index.' '.$tableRow->firstChild->nodeValue.'<br/>');
-        // $gradeBox = $tableRow->firstChild->nextSibling->nextSibling->appendChild($grade);
-
+$subjectIndex = 0;
+$subjects = array(0,1,2,6,14);
+$tds = array(39,82,125,289,798);
+@$tableBody = $xpath->query('//td');
+foreach($tds as $i){
+    $tableBody[$i]->nodeValue="";
+    $tableBody[$i+4]->nodeValue="";
+    foreach($sortedGrades[array_keys($sortedGrades)[$subjects[$subjectIndex]]][0] as $grade){
+        $tableBody[$i]->appendChild($grade);
+    }foreach($sortedGrades[array_keys($sortedGrades)[$subjects[$subjectIndex]]][1] as $grade){
+        $tableBody[$i+4]->appendChild($grade);
     }
-    $index+=1;
+    // $tableBody[$i]->appendChild($sortedGrades[array_keys($sortedGrades)[$subjectIndex]][1][0]);
+    $subjectIndex+=1;
+    
+}
+foreach ($sortedGrades as $subject){
+    // @$tableBody = $xpath->query('//tbody');
+    // print_r($tableBody[5]->childNodes[5]->nodeValue);
+    // foreach($subject[0] as $grade){
+    //     @print_r($index.' '.$tableBody->nodeValue.'<br/>');
+    //     // $gradeBox = $tableRow->firstChild->nextSibling->nextSibling->appendChild($grade);
+
+    // }
 }
 echo $librusDOM->saveHTML();
 
