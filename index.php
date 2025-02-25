@@ -104,9 +104,54 @@ foreach($sortedGrades as $subject){
             $firstLower=0;
             $secondUpper=0;
             $secondLower=0;
+            $allUpper = 0;
+            $allLower = 0;
             foreach($subject[0] as $firstGrade){
-                
+                $firstGradeValue = $firstGrade->nodeValue;
+                $firstUpper+= strval(explode("/",$firstGradeValue)[0]);
+                $firstLower+= strval(explode("/",$firstGradeValue)[1]);
+                $allUpper+= strval(explode("/",$firstGradeValue)[0]);
+                $allLower+= strval(explode("/",$firstGradeValue)[1]);
             }
+            foreach($subject[1] as $firstGrade){
+                $firstGradeValue = $firstGrade->nodeValue;
+                $secondUpper+= strval(explode("/",$firstGradeValue)[0]);
+                $secondLower+= strval(explode("/",$firstGradeValue)[1]);
+                $allUpper+= strval(explode("/",$firstGradeValue)[0]);
+                $allLower+= strval(explode("/",$firstGradeValue)[1]);
+            }
+            $firstAverage = 0;
+            $secondAverage = 0;
+            $allAverage = 0;
+            if($firstLower!=0)
+                $firstAverage = $firstUpper/$firstLower;
+            if($secondLower!=0)
+                $secondAverage = $secondUpper/$secondLower;
+            if($allLower!=0)
+                $allAverage = $allUpper/$allLower;
+            print_r($firstAverage." ".$secondAverage." ".$allAverage."<br/>");
+        }
+        else{
+            $firstIle = 0;
+            $secondIle = 0;
+            $firstGrades = 0;
+            $secondGrades = 0;
+            foreach($subject[0] as $grade){
+                $gradeValue = $grade->nodeValue;
+                $firstIle+=1;
+                $firstGrades+=strval($gradeValue);
+            }   
+            foreach($subject[1] as $grade){
+                $gradeValue = $grade->nodeValue;
+                $secondIle+=1;
+                $secondGrades+=strval($gradeValue);
+            }
+            if($firstIle!=0)
+                $firstAverage=$firstGrades/$firstIle;
+                $allAverage=($firstGrades+$secondGrades)/($firstIle+$secondIle);
+            if($secondIle!-0)
+                $secondAverage = $secondGrades/$secondIle;
+            print_r($firstAverage." ".$secondAverage." ".$allAverage."<br/>");
         }
     }
     $subjectIndex+=1;
