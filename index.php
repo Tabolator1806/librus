@@ -105,7 +105,8 @@ foreach($sortedGrades as $subject){
             $secondUpper=0;
             $secondLower=0;
             foreach($subject[0] as $firstGrade){
-                
+                $firstGradeValue = $firstGrade->nodeValue;
+                $firstUpper += int(explode("/",$firstGradeValue)[0]));
             }
         }
     }
