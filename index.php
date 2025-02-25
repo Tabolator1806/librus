@@ -98,10 +98,18 @@ $xpath->query('//table')[28]->textContent="";
 
 $subjectIndex = 0;
 foreach($sortedGrades as $subject){
-    
-    foreach($subject[0] as $firstGrade){
-        print_r($firstGrade->nodeValue);
+    if($subjectIndex!=4){
+        if(in_array($subjectIndex,$subjects)){
+            $firstUpper = 0;
+            $firstLower=0;
+            $secondUpper=0;
+            $secondLower=0;
+            foreach($subject[0] as $firstGrade){
+                
+            }
+        }
     }
+    $subjectIndex+=1;
 }
 
 echo $librusDOM->saveHTML();
