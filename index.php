@@ -96,7 +96,13 @@ foreach($tds as $i){
 }
 $xpath->query('//table')[28]->textContent="";
 
-
+$subjectIndex = 0;
+foreach($sortedGrades as $subject){
+    
+    foreach($subject[0] as $firstGrade){
+        print_r($firstGrade->nodeValue);
+    }
+}
 
 echo $librusDOM->saveHTML();
 
