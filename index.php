@@ -99,6 +99,7 @@ $xpath->query('//table')[28]->textContent="";
 $subjectIndex = 0;
 foreach($sortedGrades as $subject){
     if($subjectIndex!=4){
+        print_r(array_keys($sortedGrades)[$subjectIndex]." ");
         if(in_array($subjectIndex,$subjects)){
             $firstUpper = 0;
             $firstLower=0;
@@ -137,19 +138,27 @@ foreach($sortedGrades as $subject){
             $firstGrades = 0;
             $secondGrades = 0;
             foreach($subject[0] as $grade){
-                $gradeValue = $grade->nodeValue;
-                $firstIle+=1;
-                $firstGrades+=strval($gradeValue);
-            }   
-            foreach($subject[1] as $grade){
-                $gradeValue = $grade->nodeValue;
-                $secondIle+=1;
-                $secondGrades+=strval($gradeValue);
+                $gradeValue = str_replace("+",".5",$grade->nodeValue);
+                if($gradeValue!="np"){
+                    $firstIle+=1;
+                    $firstGrades+=strval($gradeValue);
+                }
             }
-            if($firstIle!=0)
+            foreach($subject[1] as $grade){
+                $gradeValue = str_replace("+",".5",$grade->nodeValue);
+                if($gradeValue!="np"){
+                    $secondIle+=1;
+                    $secondGrades+=strval($gradeValue);
+                }
+            }
+            $firstAverage = 0;
+            $secondAverage = 0;
+            $allAverage = 0;
+            if($firstIle!=0){
                 $firstAverage=$firstGrades/$firstIle;
                 $allAverage=($firstGrades+$secondGrades)/($firstIle+$secondIle);
-            if($secondIle!-0)
+            }
+            if($secondIle!=0)
                 $secondAverage = $secondGrades/$secondIle;
             print_r($firstAverage." ".$secondAverage." ".$allAverage."<br/>");
         }
