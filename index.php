@@ -94,15 +94,10 @@ foreach($tds as $i){
     $subjectIndex+=1;
     
 }
-foreach ($sortedGrades as $subject){
-    // @$tableBody = $xpath->query('//tbody');
-    // print_r($tableBody[5]->childNodes[5]->nodeValue);
-    // foreach($subject[0] as $grade){
-    //     @print_r($index.' '.$tableBody->nodeValue.'<br/>');
-    //     // $gradeBox = $tableRow->firstChild->nextSibling->nextSibling->appendChild($grade);
+$xpath->query('//table')[28]->textContent="";
 
-    // }
-}
+
+
 echo $librusDOM->saveHTML();
 
 function get($url)
