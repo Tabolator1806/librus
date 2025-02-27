@@ -121,7 +121,6 @@ foreach($sortedGrades as $subject){
         $sortedGrades[array_keys($sortedGrades)[$subjectIndex]][2][]=ceil($firstAverage*1000)/10;
         $sortedGrades[array_keys($sortedGrades)[$subjectIndex]][2][]=ceil($secondAverage*1000)/10;
         $sortedGrades[array_keys($sortedGrades)[$subjectIndex]][2][]=ceil($allAverage*1000)/10;
-        print_r($firstAverage." ".$secondAverage." ".$allAverage."<br/>");
     }
     else{
         $firstIle = 0;
@@ -154,7 +153,6 @@ foreach($sortedGrades as $subject){
         $sortedGrades[array_keys($sortedGrades)[$subjectIndex]][2][]=ceil($firstAverage*100)/100;
         $sortedGrades[array_keys($sortedGrades)[$subjectIndex]][2][]=ceil($secondAverage*100)/100;
         $sortedGrades[array_keys($sortedGrades)[$subjectIndex]][2][]=ceil($allAverage*100)/100;
-        print_r($firstAverage." ".$secondAverage." ".$allAverage."<br/>");
     }
 
 $subjectIndex+=1;
