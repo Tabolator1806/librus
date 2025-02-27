@@ -53,6 +53,7 @@ $librusSpanless = str_replace('<span class="fold"> ', '<span class="fold" style=
 
 @$librusDOM->loadHTML($librusSpanless);
 $xpath = new DOMXPath($librusDOM);
+// $xpath->query("//table")[0]->remove();
 $grades= $xpath->query('//span[@style!="background-color:#B0C4DE; "]');
 foreach ($grades as $gradeNode){
     @$grade = $gradeNode;
@@ -78,93 +79,100 @@ foreach ($grades as $gradeNode){
         echo $e;
     }
 }
+unset($sortedGrades[0]);
 $subjectIndex = 0;
 $subjects = array(0,1,2,6,14);
 $tds = array(39,82,125,289,798);
-@$tableBody = $xpath->query('//td');
-foreach($tds as $i){
-    $tableBody[$i]->nodeValue="";
-    $tableBody[$i+4]->nodeValue="";
-    foreach($sortedGrades[array_keys($sortedGrades)[$subjects[$subjectIndex]]][0] as $grade){
-        $tableBody[$i]->appendChild($grade);
-    }foreach($sortedGrades[array_keys($sortedGrades)[$subjects[$subjectIndex]]][1] as $grade){
-        $tableBody[$i+4]->appendChild($grade);
-    }
-    // $tableBody[$i]->appendChild($sortedGrades[array_keys($sortedGrades)[$subjectIndex]][1][0]);
-    $subjectIndex+=1;
+@$tableBody = $xpath->query('//td[@class="center micro screen-only"]/following-sibling::td');
+// @$tableBody = $xpath->query('//td');
+for($i=1;$i<(19*10);$i+=10){
+    if(in_array($subjectIndex,$subjects)){
+        $tableBody[$i]->nodeValue="";
+        $tableBody[$i+4]->nodeValue="";
     
+        foreach($sortedGrades[array_keys($sortedGrades)[$subjectIndex]][0] as $grade){
+            $tableBody[$i]->appendChild($grade);
+        }
+        foreach($sortedGrades[array_keys($sortedGrades)[$subjectIndex]][1] as $grade){
+            $tableBody[$i+4]->appendChild($grade);
+        }
+        // $tableBody[$i]->appendChild($sortedGrades[array_keys($sortedGrades)[$subjectIndex]][1][0]);
+        // print_r($sortedGrades[array_keys($sortedGrades)[$subjectIndex]][0][0]->nodeValue);
+        
+    }
+    $subjectIndex+=1;
 }
 $xpath->query('//table')[28]->textContent="";
 
 $subjectIndex = 0;
-foreach($sortedGrades as $subject){
-    if($subjectIndex!=4){
-        print_r(array_keys($sortedGrades)[$subjectIndex]." ");
-        if(in_array($subjectIndex,$subjects)){
-            $firstUpper = 0;
-            $firstLower=0;
-            $secondUpper=0;
-            $secondLower=0;
-            $allUpper = 0;
-            $allLower = 0;
-            foreach($subject[0] as $firstGrade){
-                $firstGradeValue = $firstGrade->nodeValue;
-                $firstUpper+= strval(explode("/",$firstGradeValue)[0]);
-                $firstLower+= strval(explode("/",$firstGradeValue)[1]);
-                $allUpper+= strval(explode("/",$firstGradeValue)[0]);
-                $allLower+= strval(explode("/",$firstGradeValue)[1]);
-            }
-            foreach($subject[1] as $firstGrade){
-                $firstGradeValue = $firstGrade->nodeValue;
-                $secondUpper+= strval(explode("/",$firstGradeValue)[0]);
-                $secondLower+= strval(explode("/",$firstGradeValue)[1]);
-                $allUpper+= strval(explode("/",$firstGradeValue)[0]);
-                $allLower+= strval(explode("/",$firstGradeValue)[1]);
-            }
-            $firstAverage = 0;
-            $secondAverage = 0;
-            $allAverage = 0;
-            if($firstLower!=0)
-                $firstAverage = $firstUpper/$firstLower;
-            if($secondLower!=0)
-                $secondAverage = $secondUpper/$secondLower;
-            if($allLower!=0)
-                $allAverage = $allUpper/$allLower;
-            print_r($firstAverage." ".$secondAverage." ".$allAverage."<br/>");
-        }
-        else{
-            $firstIle = 0;
-            $secondIle = 0;
-            $firstGrades = 0;
-            $secondGrades = 0;
-            foreach($subject[0] as $grade){
-                $gradeValue = str_replace("+",".5",$grade->nodeValue);
-                if($gradeValue!="np"){
-                    $firstIle+=1;
-                    $firstGrades+=strval($gradeValue);
-                }
-            }
-            foreach($subject[1] as $grade){
-                $gradeValue = str_replace("+",".5",$grade->nodeValue);
-                if($gradeValue!="np"){
-                    $secondIle+=1;
-                    $secondGrades+=strval($gradeValue);
-                }
-            }
-            $firstAverage = 0;
-            $secondAverage = 0;
-            $allAverage = 0;
-            if($firstIle!=0){
-                $firstAverage=$firstGrades/$firstIle;
-                $allAverage=($firstGrades+$secondGrades)/($firstIle+$secondIle);
-            }
-            if($secondIle!=0)
-                $secondAverage = $secondGrades/$secondIle;
-            print_r($firstAverage." ".$secondAverage." ".$allAverage."<br/>");
-        }
-    }
-    $subjectIndex+=1;
-}
+// foreach($sortedGrades as $subject){
+//     if($subjectIndex!=1358){
+//         print_r(array_keys($sortedGrades)[$subjectIndex]." ");
+//         if(in_array($subjectIndex,$subjects)){
+//             $firstUpper = 0;
+//             $firstLower=0;
+//             $secondUpper=0;
+//             $secondLower=0;
+//             $allUpper = 0;
+//             $allLower = 0;
+//             foreach($subject[0] as $firstGrade){
+//                 $firstGradeValue = $firstGrade->nodeValue;
+//                 $firstUpper+= strval(explode("/",$firstGradeValue)[0]);
+//                 $firstLower+= strval(explode("/",$firstGradeValue)[1]);
+//                 $allUpper+= strval(explode("/",$firstGradeValue)[0]);
+//                 $allLower+= strval(explode("/",$firstGradeValue)[1]);
+//             }
+//             foreach($subject[1] as $firstGrade){
+//                 $firstGradeValue = $firstGrade->nodeValue;
+//                 $secondUpper+= strval(explode("/",$firstGradeValue)[0]);
+//                 $secondLower+= strval(explode("/",$firstGradeValue)[1]);
+//                 $allUpper+= strval(explode("/",$firstGradeValue)[0]);
+//                 $allLower+= strval(explode("/",$firstGradeValue)[1]);
+//             }
+//             $firstAverage = 0;
+//             $secondAverage = 0;
+//             $allAverage = 0;
+//             if($firstLower!=0)
+//                 $firstAverage = $firstUpper/$firstLower;
+//             if($secondLower!=0)
+//                 $secondAverage = $secondUpper/$secondLower;
+//             if($allLower!=0)
+//                 $allAverage = $allUpper/$allLower;
+//             print_r($firstAverage." ".$secondAverage." ".$allAverage."<br/>");
+//         }
+//         else{
+//             $firstIle = 0;
+//             $secondIle = 0;
+//             $firstGrades = 0;
+//             $secondGrades = 0;
+//             foreach($subject[0] as $grade){
+//                 $gradeValue = str_replace("+",".5",$grade->nodeValue);
+//                 if(floatval($gradeValue)!=0){
+//                     $firstIle+=1;
+//                     $firstGrades+=floatval($gradeValue);
+//                 }
+//             }
+//             foreach($subject[1] as $grade){
+//                 $gradeValue = str_replace("+",".5",$grade->nodeValue);
+//                 if($gradeValue!="np"){
+//                     $secondIle+=1;
+//                     $secondGrades+=strval($gradeValue);
+//                 }
+//             }
+//             $firstAverage = 0;
+//             $secondAverage = 0;
+//             $allAverage = 0;
+//             if($firstIle!=0){
+//                 $firstAverage=$firstGrades/$firstIle;
+//                 $allAverage=($firstGrades+$secondGrades)/($firstIle+$secondIle);
+//             }
+//             if($secondIle!=0)
+//                 $secondAverage = $secondGrades/$secondIle;
+//             print_r($firstAverage." ".$secondAverage." ".$allAverage."<br/>");
+//         }
+//     }
+//     $subjectIndex+=1;
+// }
 
 echo $librusDOM->saveHTML();
 
