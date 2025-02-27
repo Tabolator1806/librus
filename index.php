@@ -24,25 +24,25 @@ post("https://api.librus.pl/OAuth/Authorization/2FA?client_id=46", $arr);
 $librusDOM = new DOMDocument();
 $xpath = new DOMXPath($librusDOM);
 $sortedGrades = array(
-    "aplikacje desktopowe"=>[[],[]],
-    "aplikacje mobilne"=>[[],[]],
-    "aplikacje webowe"=>[[],[]],
-    "biologia"=>[[],[]],[],
-    "chemia"=>[[],[]],
-    "fizyka"=>[[],[]],
-    "fizyka techniczna"=>[[],[]],
-    "geografia"=>[[],[]],
-    "historia"=>[[],[]],
-    "język angielski"=>[[],[]],
-    "język angielski zawodowy"=>[[],[]],
-    "język niemiecki"=>[[],[]],
-    "język polski"=>[[],[]],
-    "matematyka"=>[[],[]],
-    "praktyka zawodowa"=>[[],[]],
-    "religia/etyka"=>[[],[]],
-    "wiedza o społeczeństwie"=>[[],[]],
-    "wychowanie fizyczne"=>[[],[]],
-    "zajęcia z wychowawcą"=>[[],[]],
+    "aplikacje desktopowe"=>[[],[],[]],
+    "aplikacje mobilne"=>[[],[],[]],
+    "aplikacje webowe"=>[[],[],[]],
+    "biologia"=>[[],[],[]],
+    "chemia"=>[[],[],[]],
+    "fizyka"=>[[],[],[]],
+    "fizyka techniczna"=>[[],[],[]],
+    "geografia"=>[[],[],[]],
+    "historia"=>[[],[],[]],
+    "język angielski"=>[[],[],[]],
+    "język angielski zawodowy"=>[[],[],[]],
+    "język niemiecki"=>[[],[],[]],
+    "język polski"=>[[],[],[]],
+    "matematyka"=>[[],[],[]],
+    "praktyka zawodowa"=>[[],[],[]],
+    "religia/etyka"=>[[],[],[]],
+    "wiedza o społeczeństwie"=>[[],[],[]],
+    "wychowanie fizyczne"=>[[],[],[]],
+    "zajęcia z wychowawcą"=>[[],[],[]],
 );
 $librusFull =  get("https://synergia.librus.pl/przegladaj_oceny/uczen");
 $librusJS = str_replace('href="', 'href="https://synergia.librus.pl',$librusFull);
@@ -81,98 +81,107 @@ foreach ($grades as $gradeNode){
 }
 unset($sortedGrades[0]);
 $subjectIndex = 0;
-$subjects = array(0,1,2,6,14);
+$subjects = array(0,1,2,5,13);
 $tds = array(39,82,125,289,798);
 @$tableBody = $xpath->query('//td[@class="center micro screen-only"]/following-sibling::td');
+
+
+foreach($sortedGrades as $subject){
+    print_r(array_keys($sortedGrades)[$subjectIndex]." ");
+    if(in_array($subjectIndex,$subjects)){
+        $firstUpper = 0;
+        $firstLower=0;
+        $secondUpper=0;
+        $secondLower=0;
+        $allUpper = 0;
+        $allLower = 0;
+        foreach($subject[0] as $firstGrade){
+            $firstGradeValue = $firstGrade->nodeValue;
+            $firstUpper+= strval(explode("/",$firstGradeValue)[0]);
+            $firstLower+= strval(explode("/",$firstGradeValue)[1]);
+            $allUpper+= strval(explode("/",$firstGradeValue)[0]);
+            $allLower+= strval(explode("/",$firstGradeValue)[1]);
+        }
+        foreach($subject[1] as $firstGrade){
+            $firstGradeValue = $firstGrade->nodeValue;
+            $secondUpper+= strval(explode("/",$firstGradeValue)[0]);
+            $secondLower+= strval(explode("/",$firstGradeValue)[1]);
+            $allUpper+= strval(explode("/",$firstGradeValue)[0]);
+            $allLower+= strval(explode("/",$firstGradeValue)[1]);
+        }
+        $firstAverage = 0;
+        $secondAverage = 0;
+        $allAverage = 0;
+        if($firstLower!=0)
+            $firstAverage = $firstUpper/$firstLower;
+        if($secondLower!=0)
+            $secondAverage = $secondUpper/$secondLower;
+        if($allLower!=0)
+            $allAverage = $allUpper/$allLower;
+        $sortedGrades[array_keys($sortedGrades)[$subjectIndex]][2][]=ceil($firstAverage*1000)/10;
+        $sortedGrades[array_keys($sortedGrades)[$subjectIndex]][2][]=ceil($secondAverage*1000)/10;
+        $sortedGrades[array_keys($sortedGrades)[$subjectIndex]][2][]=ceil($allAverage*1000)/10;
+        print_r($firstAverage." ".$secondAverage." ".$allAverage."<br/>");
+    }
+    else{
+        $firstIle = 0;
+        $secondIle = 0;
+        $firstGrades = 0;
+        $secondGrades = 0;
+        foreach($subject[0] as $grade){
+            $gradeValue = str_replace("+",".5",$grade->nodeValue);
+            if(floatval($gradeValue)!=0){
+                $firstIle+=1;
+                $firstGrades+=floatval($gradeValue);
+            }
+        }
+        foreach($subject[1] as $grade){
+            $gradeValue = str_replace("+",".5",$grade->nodeValue);
+            if($gradeValue!="np"){
+                $secondIle+=1;
+                $secondGrades+=strval($gradeValue);
+            }
+        }
+        $firstAverage = 0;
+        $secondAverage = 0;
+        $allAverage = 0;
+        if($firstIle!=0){
+            $firstAverage=$firstGrades/$firstIle;
+            $allAverage=($firstGrades+$secondGrades)/($firstIle+$secondIle);
+        }
+        if($secondIle!=0)
+            $secondAverage = $secondGrades/$secondIle;
+        $sortedGrades[array_keys($sortedGrades)[$subjectIndex]][2][]=ceil($firstAverage*100)/100;
+        $sortedGrades[array_keys($sortedGrades)[$subjectIndex]][2][]=ceil($secondAverage*100)/100;
+        $sortedGrades[array_keys($sortedGrades)[$subjectIndex]][2][]=ceil($allAverage*100)/100;
+        print_r($firstAverage." ".$secondAverage." ".$allAverage."<br/>");
+    }
+
+$subjectIndex+=1;
+}
+
+
+$subjectIndex = 0;
 // @$tableBody = $xpath->query('//td');
 for($i=1;$i<(19*10);$i+=10){
     if(in_array($subjectIndex,$subjects)){
         $tableBody[$i]->nodeValue="";
         $tableBody[$i+4]->nodeValue="";
-    
-        foreach($sortedGrades[array_keys($sortedGrades)[$subjectIndex]][0] as $grade){
-            $tableBody[$i]->appendChild($grade);
-        }
-        foreach($sortedGrades[array_keys($sortedGrades)[$subjectIndex]][1] as $grade){
-            $tableBody[$i+4]->appendChild($grade);
-        }
-        // $tableBody[$i]->appendChild($sortedGrades[array_keys($sortedGrades)[$subjectIndex]][1][0]);
-        // print_r($sortedGrades[array_keys($sortedGrades)[$subjectIndex]][0][0]->nodeValue);
-        
+    }
+    $tableBody[$i+1]->nodeValue=$sortedGrades[array_keys($sortedGrades)[$subjectIndex]][2][0];
+    $tableBody[$i+5]->nodeValue=$sortedGrades[array_keys($sortedGrades)[$subjectIndex]][2][1];
+    $tableBody[$i+7]->nodeValue=$sortedGrades[array_keys($sortedGrades)[$subjectIndex]][2][2];
+    foreach($sortedGrades[array_keys($sortedGrades)[$subjectIndex]][0] as $grade){
+        $tableBody[$i]->appendChild($grade);
+    }
+    foreach($sortedGrades[array_keys($sortedGrades)[$subjectIndex]][1] as $grade){
+        $tableBody[$i+4]->appendChild($grade);
     }
     $subjectIndex+=1;
 }
 $xpath->query('//table')[28]->textContent="";
 
-$subjectIndex = 0;
-// foreach($sortedGrades as $subject){
-//     if($subjectIndex!=1358){
-//         print_r(array_keys($sortedGrades)[$subjectIndex]." ");
-//         if(in_array($subjectIndex,$subjects)){
-//             $firstUpper = 0;
-//             $firstLower=0;
-//             $secondUpper=0;
-//             $secondLower=0;
-//             $allUpper = 0;
-//             $allLower = 0;
-//             foreach($subject[0] as $firstGrade){
-//                 $firstGradeValue = $firstGrade->nodeValue;
-//                 $firstUpper+= strval(explode("/",$firstGradeValue)[0]);
-//                 $firstLower+= strval(explode("/",$firstGradeValue)[1]);
-//                 $allUpper+= strval(explode("/",$firstGradeValue)[0]);
-//                 $allLower+= strval(explode("/",$firstGradeValue)[1]);
-//             }
-//             foreach($subject[1] as $firstGrade){
-//                 $firstGradeValue = $firstGrade->nodeValue;
-//                 $secondUpper+= strval(explode("/",$firstGradeValue)[0]);
-//                 $secondLower+= strval(explode("/",$firstGradeValue)[1]);
-//                 $allUpper+= strval(explode("/",$firstGradeValue)[0]);
-//                 $allLower+= strval(explode("/",$firstGradeValue)[1]);
-//             }
-//             $firstAverage = 0;
-//             $secondAverage = 0;
-//             $allAverage = 0;
-//             if($firstLower!=0)
-//                 $firstAverage = $firstUpper/$firstLower;
-//             if($secondLower!=0)
-//                 $secondAverage = $secondUpper/$secondLower;
-//             if($allLower!=0)
-//                 $allAverage = $allUpper/$allLower;
-//             print_r($firstAverage." ".$secondAverage." ".$allAverage."<br/>");
-//         }
-//         else{
-//             $firstIle = 0;
-//             $secondIle = 0;
-//             $firstGrades = 0;
-//             $secondGrades = 0;
-//             foreach($subject[0] as $grade){
-//                 $gradeValue = str_replace("+",".5",$grade->nodeValue);
-//                 if(floatval($gradeValue)!=0){
-//                     $firstIle+=1;
-//                     $firstGrades+=floatval($gradeValue);
-//                 }
-//             }
-//             foreach($subject[1] as $grade){
-//                 $gradeValue = str_replace("+",".5",$grade->nodeValue);
-//                 if($gradeValue!="np"){
-//                     $secondIle+=1;
-//                     $secondGrades+=strval($gradeValue);
-//                 }
-//             }
-//             $firstAverage = 0;
-//             $secondAverage = 0;
-//             $allAverage = 0;
-//             if($firstIle!=0){
-//                 $firstAverage=$firstGrades/$firstIle;
-//                 $allAverage=($firstGrades+$secondGrades)/($firstIle+$secondIle);
-//             }
-//             if($secondIle!=0)
-//                 $secondAverage = $secondGrades/$secondIle;
-//             print_r($firstAverage." ".$secondAverage." ".$allAverage."<br/>");
-//         }
-//     }
-//     $subjectIndex+=1;
-// }
+
 
 echo $librusDOM->saveHTML();
 
