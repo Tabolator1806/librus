@@ -87,7 +87,6 @@ $tds = array(39,82,125,289,798);
 
 
 foreach($sortedGrades as $subject){
-    print_r(array_keys($sortedGrades)[$subjectIndex]." ");
     if(in_array($subjectIndex,$subjects)){
         $firstUpper = 0;
         $firstLower=0;
