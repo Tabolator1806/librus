@@ -58,27 +58,31 @@ $grades= $xpath->query('//span[@style!="background-color:#B0C4DE; "]');
 foreach ($grades as $gradeNode){
     @$grade = $gradeNode;
     @$subject = $gradeNode->parentNode->previousSibling->nodeValue;
-    try{
-        if(key_exists($subject,$sortedGrades)){
-            $sortedGrades[$subject][0][]=$grade;
-        }
-        else{
-            @$subject = $gradeNode->parentNode->previousSibling->previousSibling->previousSibling->previousSibling->nodeValue;
+    if($grade->nodeValue!="nb"){
+        try{
             if(key_exists($subject,$sortedGrades)){
-                $sortedGrades[$subject][1][]=$grade;
+                $sortedGrades[$subject][0][]=$grade;
             }
             else{
-                @$subject = $gradeNode->parentNode->previousSibling->previousSibling->previousSibling->previousSibling->previousSibling->nodeValue;
+                @$subject = $gradeNode->parentNode->previousSibling->previousSibling->previousSibling->previousSibling->nodeValue;
                 if(key_exists($subject,$sortedGrades)){
                     $sortedGrades[$subject][1][]=$grade;
                 }
+                else{
+                    @$subject = $gradeNode->parentNode->previousSibling->previousSibling->previousSibling->previousSibling->previousSibling->nodeValue;
+                    if(key_exists($subject,$sortedGrades)){
+                        $sortedGrades[$subject][1][]=$grade;
+                    }
+                }
             }
         }
+        catch(Exception $e){
+            echo $e;
+        }
     }
-    catch(Exception $e){
-        echo $e;
-    }
+    
 }
+
 unset($sortedGrades[0]);
 $subjectIndex = 0;
 $subjects = array(0,1,2,5,13);
@@ -117,9 +121,9 @@ foreach($sortedGrades as $subject){
             $secondAverage = $secondUpper/$secondLower;
         if($allLower!=0)
             $allAverage = $allUpper/$allLower;
-        $sortedGrades[array_keys($sortedGrades)[$subjectIndex]][2][]=ceil($firstAverage*1000)/10;
-        $sortedGrades[array_keys($sortedGrades)[$subjectIndex]][2][]=ceil($secondAverage*1000)/10;
-        $sortedGrades[array_keys($sortedGrades)[$subjectIndex]][2][]=ceil($allAverage*1000)/10;
+        $sortedGrades[array_keys($sortedGrades)[$subjectIndex]][2][]=(ceil($firstAverage*1000)/10)."%";
+        $sortedGrades[array_keys($sortedGrades)[$subjectIndex]][2][]=(ceil($secondAverage*1000)/10)."%";
+        $sortedGrades[array_keys($sortedGrades)[$subjectIndex]][2][]=(ceil($allAverage*1000)/10)."%";
     }
     else{
         $firstIle = 0;
@@ -135,7 +139,7 @@ foreach($sortedGrades as $subject){
         }
         foreach($subject[1] as $grade){
             $gradeValue = str_replace("+",".5",$grade->nodeValue);
-            if($gradeValue!="np"){
+            if(floatval($gradeValue)!=0){
                 $secondIle+=1;
                 $secondGrades+=strval($gradeValue);
             }
